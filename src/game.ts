@@ -1,47 +1,34 @@
-import * as Phaser from 'phaser';
+import * as Phaser from 'phaser'
 
-export default class Demo extends Phaser.Scene
-{
-    constructor ()
-    {
-        super('demo');
-    }
+let testSprite1
+let click
 
-    preload ()
-    {
-        this.load.image('logo', 'assets/phaser3-logo.png');
-        this.load.image('libs', 'assets/libs.png');
-        this.load.glsl('bundle', 'assets/plasma-bundle.glsl.js');
-        this.load.glsl('stars', 'assets/starfields.glsl.js');
-    }
-
-    create ()
-    {
-        this.add.shader('RGB Shift Field', 0, 0, 800, 600).setOrigin(0);
-
-        this.add.shader('Plasma', 0, 412, 800, 172).setOrigin(0);
-
-        this.add.image(400, 300, 'libs');
-
-        const logo = this.add.image(400, 70, 'logo');
-
-        this.tweens.add({
-            targets: logo,
-            y: 350,
-            duration: 1500,
-            ease: 'Sine.inOut',
-            yoyo: true,
-            repeat: -1
-        })
-    }
+function preload() {
+  this.load.image("test1", "assets/test.png")
 }
 
-const config = {
-    type: Phaser.AUTO,
-    backgroundColor: '#125555',
-    width: 800,
-    height: 600,
-    scene: Demo
-};
+function create() {
+  testSprite1 = this.physics.add.sprite(50, 50, "test1")
+  click = new Phaser.Math.Vector2()
 
-const game = new Phaser.Game(config);
+  this.input.on('pointerup', pointer => {
+    click.x = pointer.x
+    click.y = pointer.y
+    this.physics.moveToObject(testSprite1, click, 200)
+  })
+}
+
+function update() {
+  if (Phaser.Math.Distance.Between(testSprite1.x, testSprite1.y, click.x, click.y) < 2) {
+    testSprite1.body.reset(click.x, click.y)
+  }
+}
+
+new Phaser.Game({
+  type: Phaser.AUTO,
+  physics: { default: 'arcade' },
+  width: 800,
+  height: 600,
+  backgroundColor: '#FFFFFF',
+  scene: { preload, create, update }
+})
